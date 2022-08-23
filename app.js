@@ -5,8 +5,12 @@ const btnAgregar = document.querySelector('#enter');
 const check = 'fa-check-circle';
 const onCheck = 'fa-circle';
 const LineThrough = 'line-throuhg';
-let id = 0;
+let id;
+let LIST = [];
 
+//Fecha de la TL
+const FECHA = new Date();
+fecha.innerHTML = FECHA.toLocaleDateString('es-MX',{weekday:'long', month:'short', day:'numeric'});
 
 
 function agregarTarea(tarea,id,realizado,eliminado){
@@ -38,6 +42,7 @@ function tareaRealizada(element){
     element.classList.toggle(check);
     element.classList.toggle(onCheck);
     element.parentNode.querySelector('.text').classList.toggle(LineThrough);
+    LIST[element.id].realizado = LIST[element.id].realizado ? false : true;
 }
 
 
@@ -51,7 +56,16 @@ btnAgregar.addEventListener('click', () => {
     const tarea = input.value;
     if(tarea){
         agregarTarea(tarea,id,false,false);
+        LIST.push({
+            nombre: tarea,
+            id: id,
+            realizado:false,
+            eliminado: false
+        });
     };
+
+
+    localStorage.setItem('TODO',JSON.stringify(LIST));
 
     input.value = "";
     id++;
@@ -63,8 +77,17 @@ document.addEventListener('keyup', function(event){
         const tarea = input.value;
         if(tarea){
             agregarTarea(tarea,id,false,false);
+            LIST.push({
+                nombre: tarea,
+                id: id,
+                realizado:false,
+                eliminado: false
+            });
             };
 
+
+        localStorage.setItem('TODO',JSON.stringify(LIST));
+        
         input.value = "";
         id++;
     }
@@ -81,5 +104,27 @@ lista.addEventListener('click',function(event){
     }else if(elementData === 'eliminado'){
         TareaEliminado(element);
     };
+    localStorage.setItem('TODO',JSON.stringify(LIST));
 
 });
+
+
+//localStorage.setItem('Todo.JOSN.stringify(LIST));
+
+
+//localStorage.getItem('Todo);
+let data = localStorage.getItem('TODO');
+if(data){
+    LIST=JSON.parse(data);
+    id = LIST.length;
+    cargarLista(LIST);
+}else{
+    LIST = [];
+    id = 0;
+}
+
+function cargarLista(DATA){
+    DATA.forEach(function(i){
+        agregarTarea(i.nombre,i.id,i.realizado,i.eliminado)
+    });
+}
